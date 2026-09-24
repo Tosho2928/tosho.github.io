@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>School Result Management System</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="topbar">
+    <div>
+      <h1 id="schoolName">School Result Management System</h1>
+      <p>Student Academic Performance Portal</p>
+    </div>
+    <button id="resetDataBtn" class="danger small">Reset Demo Data</button>
+  </header>
+
+  <nav class="tabs">
+    <button class="tab active" data-section="dashboard">Dashboard</button>
+    <button class="tab" data-section="students">Students</button>
+    <button class="tab" data-section="results">Enter Results</button>
+    <button class="tab" data-section="report">Report Sheet</button>
+    <button class="tab" data-section="subjects">Subjects</button>
+    <button class="tab" data-section="settings">Settings</button>
+  </nav>
+
+  <main>
+    <section id="dashboard" class="section active">
+      <div class="hero">
+        <div>
+          <h2>Academic Results Dashboard</h2>
+          <p>Manage students, enter continuous assessment and examination scores, and generate report sheets.</p>
+        </div>
+        <div class="filters">
+          <select id="dashboardSession"></select>
+          <select id="dashboardTerm">
+            <option>First Term</option>
+            <option>Second Term</option>
+            <option>Third Term</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="stats">
+        <div class="card"><span>Total Students</span><strong id="statStudents">0</strong></div>
+        <div class="card"><span>Total Subjects</span><strong id="statSubjects">0</strong></div>
+        <div class="card"><span>Results Entered</span><strong id="statResults">0</strong></div>
+        <div class="card"><span>Results Pending</span><strong id="statPending">0</strong></div>
+      </div>
+
+      <div class="grid two">
+        <div class="panel">
+          <h3>Quick Actions</h3>
+          <div class="quick-actions">
+            <button class="primary" data-go="students">Add Student</button>
+            <button class="secondary" data-go="results">Enter Results</button>
+            <button class="secondary" data-go="report">View Report Sheet</button>
+          </div>
+        </div>
+        <div class="panel">
+          <h3>Current Session</h3>
+          <p id="currentSessionSummary"></p>
+          <p class="muted">This prototype stores data in your browser using localStorage.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="students" class="section">
+      <div class="section-heading">
+        <div>
+          <h2>Students</h2>
+          <p>Add and manage student records.</p>
+        </div>
+        <button id="newStudentBtn" class="primary">+ New Student</button>
+      </div>
+
+      <form id="studentForm" class="panel form-grid hidden">
+        <input type="hidden" id="studentId">
+        <label>Admission Number<input id="admissionNo" required></label>
+        <label>Full Name<input id="studentName" required></label>
+        <label>Gender
+          <select id="gender" required>
+            <option value="">Select</option><option>Male</option><option>Female</option>
+          </select>
+        </label>
+        <label>Class<input id="studentClass" placeholder="e.g. JSS 2" required></label>
+        <label>Arm<input id="studentArm" placeholder="e.g. A" required></label>
+        <label>Date of Birth<input id="dob" type="date"></label>
+        <label>Session<input id="studentSession" placeholder="2026/2027" required></label>
+        <label>Photo URL <input id="photoUrl" placeholder="Optional image URL"></label>
+        <div class="form-actions">
+          <button type="submit" class="primary">Save Student</button>
+          <button type="button" id="cancelStudentBtn" class="ghost">Cancel</button>
+        </div>
+      </form>
+
+      <div class="panel">
+        <div class="toolbar">
+          <input id="studentSearch" placeholder="Search by name, admission number or class...">
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Admission No.</th><th>Name</th><th>Gender</th><th>Class</th><th>Arm</th><th>Session</th><th>Actions</th></tr></thead>
+            <tbody id="studentsTable"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section id="results" class="section">
+      <div class="section-heading">
+        <div>
+          <h2>Enter Results</h2>
+          <p>Enter CA and examination scores for each subject.</p>
+        </div>
+      </div>
+
+      <div class="panel selector-grid">
+        <label>Student<select id="resultStudent"></select></label>
+        <label>Session<select id="resultSession"></select></label>
+        <label>Term
+          <select id="resultTerm">
+            <option>First Term</option><option>Second Term</option><option>Third Term</option>
+          </select>
+        </label>
+      </div>
+
+      <div id="resultsEditor" class="panel hidden">
+        <div class="student-banner" id="resultStudentInfo"></div>
+        <div class="table-wrap">
+          <table class="score-table">
+            <thead>
+              <tr><th>S/N</th><th>Subject</th><th>1st CA<br><small>/10</small></th><th>2nd CA<br><small>/10</small></th><th>3rd CA<br><small>/10</small></th><th>Exam<br><small>/70</small></th><th>Total</th><th>Grade</th><th>Remark</th></tr>
+            </thead>
+            <tbody id="resultsTable"></tbody>
+          </table>
+        </div>
+        <div class="result-summary">
+          <span>Total: <b id="editorTotal">0</b></span>
+          <span>Average: <b id="editorAverage">0</b></span>
+          <span>Passed: <b id="editorPassed">0</b></span>
+          <span>Failed: <b id="editorFailed">0</b></span>
+        </div>
+        <button id="saveResultsBtn" class="primary">Save Results</button>
+      </div>
+    </section>
+
+    <section id="report" class="section">
+      <div class="section-heading no-print">
+        <div>
+          <h2>Report Sheet</h2>
+          <p>Generate and print a student's termly report.</p>
+        </div>
+        <button id="printBtn" class="primary">Print Report</button>
+      </div>
+
+      <div class="panel no-print selector-grid">
+        <label>Student<select id="reportStudent"></select></label>
+        <label>Session<select id="reportSession"></select></label>
+        <label>Term
+          <select id="reportTerm">
+            <option>First Term</option><option>Second Term</option><option>Third Term</option>
+          </select>
+        </label>
+        <button id="generateReportBtn" class="secondary">Generate</button>
+      </div>
+
+      <div id="reportSheet" class="report-sheet">
+        <div class="report-header">
+          <div class="school-logo" id="reportLogo">S</div>
+          <div>
+            <h1 id="reportSchoolName">SCHOOL RESULT MANAGEMENT SYSTEM</h1>
+            <p id="reportAddress">School Address</p>
+            <p id="reportContact">Phone • Email</p>
+            <h2>STUDENT REPORT SHEET</h2>
+          </div>
+        </div>
+
+        <div class="student-details">
+          <div><b>Student:</b> <span id="rName">—</span></div>
+          <div><b>Admission No:</b> <span id="rAdmission">—</span></div>
+          <div><b>Gender:</b> <span id="rGender">—</span></div>
+          <div><b>Class:</b> <span id="rClass">—</span></div>
+          <div><b>Arm:</b> <span id="rArm">—</span></div>
+          <div><b>Session:</b> <span id="rSession">—</span></div>
+          <div><b>Term:</b> <span id="rTerm">—</span></div>
+          <div><b>Position:</b> <span id="rPosition">—</span></div>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>S/N</th><th>Subject</th><th>1st CA</th><th>2nd CA</th><th>3rd CA</th><th>Exam</th><th>Total</th><th>Grade</th><th>Remark</th></tr></thead>
+            <tbody id="reportTable"></tbody>
+          </table>
+        </div>
+
+        <div class="report-summary">
+          <div><span>Total Score</span><strong id="rTotal">0</strong></div>
+          <div><span>Average</span><strong id="rAverage">0</strong></div>
+          <div><span>Passed</span><strong id="rPassed">0</strong></div>
+          <div><span>Failed</span><strong id="rFailed">0</strong></div>
+        </div>
+
+        <div class="comments">
+          <p><b>Class Teacher's Comment:</b> <span id="teacherComment">Keep working hard and remain focused.</span></p>
+          <p><b>Principal's Comment:</b> <span id="principalComment">Good effort. Continue to improve.</span></p>
+        </div>
+
+        <div class="signatures">
+          <div>________________________<br>Class Teacher</div>
+          <div>________________________<br>Principal</div>
+          <div>________________________<br>Date</div>
+        </div>
+      </div>
+    </section>
+
+    <section id="subjects" class="section">
+      <div class="section-heading">
+        <div><h2>Subjects</h2><p>Manage the subjects offered by the school.</p></div>
+      </div>
+      <form id="subjectForm" class="panel inline-form">
+        <input id="newSubject" placeholder="Enter subject name" required>
+        <button class="primary" type="submit">Add Subject</button>
+      </form>
+      <div class="panel">
+        <div id="subjectList" class="subject-list"></div>
+      </div>
+    </section>
+
+    <section id="settings" class="section">
+      <div class="section-heading"><div><h2>Settings</h2><p>Customize the school information and grading system.</p></div></div>
+      <form id="settingsForm" class="panel form-grid">
+        <label>School Name<input id="settingSchoolName" required></label>
+        <label>School Address<input id="settingAddress"></label>
+        <label>Phone Number<input id="settingPhone"></label>
+        <label>Email<input id="settingEmail" type="email"></label>
+        <label>Logo Text<input id="settingLogo" maxlength="3"></label>
+        <label>Academic Session<input id="settingSession" placeholder="2026/2027"></label>
+        <div class="form-actions"><button class="primary">Save Settings</button></div>
+      </form>
+
+      <div class="panel">
+        <h3>Grading Scale</h3>
+        <p class="muted">Current scale: A 70–100, B 60–69, C 50–59, D 45–49, E 40–44, F 0–39.</p>
+      </div>
+    </section>
+  </main>
+
+  <div id="toast" class="toast"></div>
+  <script src="script.js"></script>
+</body>
+</html>
